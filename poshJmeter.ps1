@@ -235,7 +235,7 @@ function Test-JMeterPath
 		[string] $JMeterPath
 	)
 	$jmeterBatFile = "jmeter.bat"
-	if (Test-Path $JMeterPath)
+	if (Test-Path -PathType Container $JMeterPath)
 	{
 		# now validate that we can find jmeter.bat
 		$batPath = Join-Path $JMeterPath $jmeterBatFile

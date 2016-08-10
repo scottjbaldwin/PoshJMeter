@@ -1,0 +1,3 @@
+[submodule "External/Pester"]
+	path = External/Pester
+	url = https://github.com/pester/Pester.git
