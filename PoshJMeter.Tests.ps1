@@ -14,5 +14,15 @@ Describe "Test-JMeterPath" {
 			$result | Should Be $False
 		}
 	}
+	Context "When Path Found" {
+		Mock Test-Path {return $True}
+
+		$path = "C:\Program Files (x86)\apache-jmeter-2.13\bin"
+		$result = Test-JMeterPath($path)
+
+		It "Returns true" {
+			$result | Should Be $True
+		}
+	}
 }
 
