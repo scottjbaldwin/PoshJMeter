@@ -66,9 +66,9 @@ function Start-JMeter
 	$jmeterBinPath = Find-JMeter
 
 	$jmeterBat = Join-Path $jmeterBinPath "jmeter.bat"
-	Write-Verbose "Path to jmeter $jmeterBat"
 
 	$properties = @()
+	$arguments = @()
 	if ($Property)
 	{
 		$properties = $Property.Keys | % {"-J{0}={1}" -f $_, $Property[$_] }
@@ -82,18 +82,21 @@ function Start-JMeter
 		}
 		if (Test-Path -PathType Leaf $TestFile)
 		{
-			$cmd = "$jmeterBat -n -t $TestFile -j $LogFile"
+			$arguments = $properties
+			$arguments += @("-t", $TestFile)
+			$arguments += "-n"
 
-			if ($properties.Length -gt 0)
+			if ($LogFile)
 			{
-				$cmd += $properties -join " "
+				$arguments += @("-j", $LogFile)
 			}
 
-			&$cmd
+			Write-Verbose "Executing command: $jmeterBat with arguments $arguments"
+			& $jmeterBat $arguments
 		}
 		else
 		{
-			Throw "You must spicify a valid test file to execute"
+			Throw "You must specify a valid jmeter test file to execute"
 		}
 	}
 	else
@@ -256,4 +259,31 @@ function Test-JMeterPath
 	}
 
 	$False
+}
+
+<#
+.SYNOPSIS
+Stops a JMeter test that has been started in non-Gui mode
+
+.DESCRIPTION
+Stops a non-gui initialted JMeter test by calling the underlying stoptest.cmd in the jmeter bin folder.
+#>
+function Stop-JMeterTest
+{
+	[CmdletBinding()]
+	Param(
+		[Parameter()]
+		[int] $CommandPort
+	)
+
+	$jmeterBinPath = Find-JMeter
+
+	$jmeterStopCommand = Join-Path $jMeterBinPath "stoptest.cmd"
+
+	if ($CommandPort -ne $null)
+	{
+		$jmeterStopCommand += (" {0}" -f $CommandPort)
+	}
+
+	Invoke-Expression -Command $jmeterStopCommand
 }
